@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 13, "column": 0}, "map": {"version":3,"sources":["file:///Users/ruchieka/Desktop/lexicon-daily/app/favicon.ico.mjs%20(structured%20image%20object)"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 48, height: 48 }\n"],"names":["src","width","height"],"mappings":";;;;AAAA;;uCACe;IAAEA,KAAAA,mIAAG;IAAEC,OAAO;IAAIC,QAAQ;AAAG"}},
+    {"offset": {"line": 27, "column": 0}, "map": {"version":3,"sources":["file:///Users/ruchieka/Desktop/lexicon-daily/app/learn/page.tsx"],"sourcesContent":["<div className=\"mb-8 grid grid-cols-2 gap-4\">\n  <div className=\"border border-[#EEE9EF] p-4\">\n    <p className=\"font-serif text-2xl\">{dueCount}</p>\n    <p className=\"mt-1 text-xs text-[#95839E]\">\n      Reviews due now\n    </p>\n  </div>\n\n  <div className=\"border border-[#EEE9EF] p-4\">\n    <p className=\"font-serif text-2xl\">{futureCount}</p>\n    <p className=\"mt-1 text-xs text-[#95839E]\">\n      Scheduled for later\n    </p>\n  </div>\n</div>"],"names":["className","dueCount","futureCount"],"mappings":";cAAA,QAAC;IAAIA,WAAU;;sBACb,QAAC;YAAIA,WAAU;;8BACb,QAAC;oBAAEA,WAAU;8BAAuBC;;;;;;8BACpC,QAAC;oBAAED,WAAU;8BAA8B;;;;;;;;;;;;sBAK7C,QAAC;YAAIA,WAAU;;8BACb,QAAC;oBAAEA,WAAU;8BAAuBE;;;;;;8BACpC,QAAC;oBAAEF,WAAU;8BAA8B"}}]
+}

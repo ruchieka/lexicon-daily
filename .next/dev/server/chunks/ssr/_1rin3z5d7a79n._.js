@@ -1,0 +1,1079 @@
+module.exports = [
+"[project]/app/learn/page.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>LearnPage
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$data$2f$words$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/data/words.ts [app-ssr] (ecmascript)");
+"use client";
+;
+;
+;
+const STORAGE_KEY = "lexicon-progress";
+const DAY = 24 * 60 * 60 * 1000;
+const TEN_MINUTES = 10 * 60 * 1000;
+const emptyProgress = {
+    xp: 0,
+    mastered: [],
+    revision: [],
+    schedule: {}
+};
+function buildSessionQueue(progress) {
+    const now = Date.now();
+    const dueWords = __TURBOPACK__imported__module__$5b$project$5d2f$data$2f$words$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["words"].filter((word)=>{
+        const schedule = progress.schedule[word.id];
+        return schedule && schedule.dueAt <= now;
+    }).sort((a, b)=>progress.schedule[a.id].dueAt - progress.schedule[b.id].dueAt);
+    const newWords = __TURBOPACK__imported__module__$5b$project$5d2f$data$2f$words$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["words"].filter((word)=>!progress.schedule[word.id]);
+    return [
+        ...dueWords,
+        ...newWords
+    ];
+}
+function getNextInterval(repetitions) {
+    const intervals = [
+        1,
+        3,
+        7,
+        14,
+        30
+    ];
+    return intervals[Math.min(repetitions, intervals.length - 1)];
+}
+function LearnPage() {
+    const [progress, setProgress] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(emptyProgress);
+    const [loaded, setLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [sessionWords, setSessionWords] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [index, setIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [revealed, setRevealed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [finished, setFinished] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [known, setKnown] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [review, setReview] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        let savedProgress = emptyProgress;
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                savedProgress = {
+                    xp: parsed.xp ?? 0,
+                    mastered: parsed.mastered ?? [],
+                    revision: parsed.revision ?? [],
+                    schedule: parsed.schedule ?? {}
+                };
+            }
+        } catch  {
+            console.error("Could not load learning progress.");
+        }
+        setProgress(savedProgress);
+        setSessionWords(buildSessionQueue(savedProgress));
+        setLoaded(true);
+    }, []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (loaded) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+        }
+    }, [
+        progress,
+        loaded
+    ]);
+    const word = sessionWords[index];
+    function answer(didKnow) {
+        if (!word) return;
+        const wordId = word.id;
+        const now = Date.now();
+        const previousSchedule = progress.schedule[wordId];
+        if (didKnow) {
+            setKnown((previous)=>previous + 1);
+            const repetitions = previousSchedule?.repetitions ?? 0;
+            const intervalDays = getNextInterval(repetitions);
+            setProgress((previous)=>({
+                    ...previous,
+                    xp: previous.xp + 10,
+                    mastered: previous.mastered.includes(wordId) ? previous.mastered : [
+                        ...previous.mastered,
+                        wordId
+                    ],
+                    revision: previous.revision.filter((id)=>id !== wordId),
+                    schedule: {
+                        ...previous.schedule,
+                        [wordId]: {
+                            dueAt: now + intervalDays * DAY,
+                            intervalDays,
+                            repetitions: repetitions + 1
+                        }
+                    }
+                }));
+        } else {
+            setReview((previous)=>previous + 1);
+            setProgress((previous)=>({
+                    ...previous,
+                    revision: previous.revision.includes(wordId) ? previous.revision : [
+                        ...previous.revision,
+                        wordId
+                    ],
+                    mastered: previous.mastered.filter((id)=>id !== wordId),
+                    schedule: {
+                        ...previous.schedule,
+                        [wordId]: {
+                            dueAt: now + TEN_MINUTES,
+                            intervalDays: 0,
+                            repetitions: 0
+                        }
+                    }
+                }));
+        }
+        if (index === sessionWords.length - 1) {
+            setFinished(true);
+        } else {
+            setIndex((previous)=>previous + 1);
+            setRevealed(false);
+        }
+    }
+    function restart() {
+        const nextQueue = buildSessionQueue(progress);
+        setSessionWords(nextQueue);
+        setIndex(0);
+        setKnown(0);
+        setReview(0);
+        setRevealed(false);
+        setFinished(false);
+    }
+    if (!loaded) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+        className: "min-h-screen bg-white px-6 py-10 text-[#373247] md:px-12",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mx-auto max-w-3xl",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                    href: "/",
+                    className: "text-xs tracking-[0.2em] text-[#95839E] transition hover:text-[#62546E]",
+                    children: "← LEXICON."
+                }, void 0, false, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 177,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
+                    className: "mb-12 mt-14 text-center",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "text-[10px] uppercase tracking-[0.35em] text-[#A495A9]",
+                            children: "EST. 2026 · THE LEARNING STUDIO"
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 185,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                            className: "font-serif mt-5 text-5xl tracking-tight md:text-6xl",
+                            children: "The Art of Recall."
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 189,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "mt-4 text-sm text-[#95839E]",
+                            children: "An exercise in remembering what you ought to know."
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 193,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 184,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mb-10 grid grid-cols-3 border-y border-[#EEE9EF] py-5 text-center",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-serif text-3xl",
+                                    children: progress.xp
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 200,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-1 text-[10px] uppercase tracking-[0.15em] text-[#A495A9]",
+                                    children: "Total XP"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 201,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 199,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "border-x border-[#EEE9EF]",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-serif text-3xl",
+                                    children: known
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 207,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-1 text-[10px] uppercase tracking-[0.15em] text-[#A495A9]",
+                                    children: "Remembered"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 208,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 206,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-serif text-3xl",
+                                    children: review
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 214,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-1 text-[10px] uppercase tracking-[0.15em] text-[#A495A9]",
+                                    children: "To revise"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 215,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 213,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 198,
+                    columnNumber: 9
+                }, this),
+                sessionWords.length > 0 && !finished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-3 flex justify-between text-xs text-[#95839E]",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    children: "Today's practice"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 224,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    children: [
+                                        index + 1,
+                                        " / ",
+                                        sessionWords.length
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 225,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 223,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-10 h-[3px] w-full bg-[#F0ECF1]",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "h-full bg-[#B8A3C7] transition-all duration-500",
+                                style: {
+                                    width: `${(index + 1) / sessionWords.length * 100}%`
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/app/learn/page.tsx",
+                                lineNumber: 229,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 228,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 222,
+                    columnNumber: 11
+                }, this),
+                sessionWords.length === 0 && !finished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "border border-[#EEE9EF] px-7 py-16 text-center md:px-14",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "text-[10px] uppercase tracking-[0.3em] text-[#A495A9]",
+                            children: "YOU ARE UP TO DATE"
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 241,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                            className: "font-serif mt-6 text-4xl",
+                            children: "Nothing due just yet."
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 245,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "mx-auto mt-5 max-w-sm text-sm leading-7 text-[#95839E]",
+                            children: "Your words are scheduled for future revision. Come back when your next review is due."
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 249,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 240,
+                    columnNumber: 11
+                }, this) : finished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "border border-[#EEE9EF] px-7 py-14 text-center md:px-14",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "text-[10px] uppercase tracking-[0.3em] text-[#A495A9]",
+                            children: "SESSION COMPLETE"
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 256,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                            className: "font-serif mt-6 text-4xl",
+                            children: "Quite the vocabulary."
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 260,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mx-auto my-10 grid max-w-sm grid-cols-2 divide-x divide-[#EEE9EF] border-y border-[#EEE9EF] py-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "font-serif text-4xl",
+                                            children: known
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 266,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "mt-2 text-xs text-[#95839E]",
+                                            children: "Remembered"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 267,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 265,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "font-serif text-4xl",
+                                            children: review
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 271,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "mt-2 text-xs text-[#95839E]",
+                                            children: "To revise"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 272,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 270,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 264,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "mb-8 text-sm text-[#95839E]",
+                            children: [
+                                "You earned ",
+                                known * 10,
+                                " XP this session."
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 276,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: restart,
+                            className: "border border-[#B8A3C7] px-8 py-3 text-xs uppercase tracking-[0.15em] text-[#62546E] transition hover:bg-[#F8F5FA]",
+                            children: "Start another session →"
+                        }, void 0, false, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 280,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 255,
+                    columnNumber: 11
+                }, this) : word ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "border border-[#EEE9EF] bg-white px-7 py-10 md:px-14 md:py-14",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center justify-between",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-[10px] uppercase tracking-[0.2em] text-[#95839E]",
+                                    children: word.category
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 291,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-[10px] uppercase tracking-[0.15em] text-[#B3A8B7]",
+                                    children: word.difficulty
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 295,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 290,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "min-h-[300px] py-12 text-center",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "text-[10px] uppercase tracking-[0.3em] text-[#A495A9]",
+                                    children: revealed ? "THE MEANING" : "CAN YOU RECALL THIS WORD?"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 301,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                    className: "font-serif mt-9 break-words text-4xl tracking-tight md:text-5xl",
+                                    children: word.term
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 305,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-4 text-sm tracking-wide text-[#A495A9]",
+                                    children: word.pronunciation
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 309,
+                                    columnNumber: 15
+                                }, this),
+                                !revealed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setRevealed(true),
+                                    className: "mt-14 border-b border-[#B8A3C7] pb-2 text-xs uppercase tracking-[0.18em] text-[#62546E] transition hover:text-[#95839E]",
+                                    children: "Reveal meaning ↓"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 314,
+                                    columnNumber: 17
+                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mx-auto mt-10 max-w-xl text-left",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm leading-8 text-[#494252]",
+                                            children: word.meaning
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 322,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "my-8 border-l-2 border-[#D9CCDF] pl-5",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "text-[10px] uppercase tracking-[0.2em] text-[#A495A9]",
+                                                    children: "The nuance"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/learn/page.tsx",
+                                                    lineNumber: 327,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "mt-3 text-sm leading-7 text-[#75677D]",
+                                                    children: word.nuance
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/learn/page.tsx",
+                                                    lineNumber: 331,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 326,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-[10px] uppercase tracking-[0.2em] text-[#A495A9]",
+                                            children: "In a sentence"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 336,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "font-serif mt-3 text-lg italic leading-8 text-[#62546E]",
+                                            children: [
+                                                "“",
+                                                word.example,
+                                                "”"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/learn/page.tsx",
+                                            lineNumber: 340,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 321,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 300,
+                            columnNumber: 13
+                        }, this),
+                        revealed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "grid grid-cols-2 gap-4 border-t border-[#EEE9EF] pt-7",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>answer(false),
+                                    className: "border border-[#E6D8D5] px-3 py-4 text-xs tracking-wide text-[#8C6D68] transition hover:bg-[#FBF7F6]",
+                                    children: "✕ Didn't know"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 349,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>answer(true),
+                                    className: "border border-[#DCE5D9] px-3 py-4 text-xs tracking-wide text-[#657A61] transition hover:bg-[#F7FAF6]",
+                                    children: "✓ I knew it"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/learn/page.tsx",
+                                    lineNumber: 356,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/learn/page.tsx",
+                            lineNumber: 348,
+                            columnNumber: 15
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 288,
+                    columnNumber: 11
+                }, this) : null,
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
+                    className: "mt-10 text-center",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-[10px] uppercase tracking-[0.25em] text-[#B3A8B7]",
+                        children: "A little pretension never hurt."
+                    }, void 0, false, {
+                        fileName: "[project]/app/learn/page.tsx",
+                        lineNumber: 368,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/learn/page.tsx",
+                    lineNumber: 367,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/learn/page.tsx",
+            lineNumber: 175,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/learn/page.tsx",
+        lineNumber: 174,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/data/words.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "words",
+    ()=>words
+]);
+const words = [
+    {
+        id: 1,
+        term: "Clinamen",
+        pronunciation: "/ˈklaɪnəmən/",
+        partOfSpeech: "Noun",
+        meaning: "An unpredictable swerve in the motion of atoms, in ancient Epicurean philosophy.",
+        nuance: "Later adopted as a metaphor for deviation, creative disruption, or the unexpected departure from an established order.",
+        etymology: "Latin clinamen, from clinare, meaning to bend or incline.",
+        example: "Her entire artistic practice seemed organised around the clinamen: the deliberate refusal to follow an expected trajectory.",
+        synonyms: [
+            "Deviation",
+            "Swerve",
+            "Deflection"
+        ],
+        antonyms: [
+            "Conformity",
+            "Regularity",
+            "Determinism"
+        ],
+        category: "Philosophy",
+        difficulty: "Expert"
+    },
+    {
+        id: 2,
+        term: "Apophasis",
+        pronunciation: "/əˈpɒfəsɪs/",
+        partOfSpeech: "Noun",
+        meaning: "A rhetorical device in which a speaker draws attention to something by claiming not to mention it.",
+        nuance: "The classic manoeuvre of saying that one will not discuss someone's scandal, while ensuring everyone hears about it.",
+        etymology: "Greek apophasis, meaning denial or negation.",
+        example: "His remark, 'I won't mention her rather questionable professional history,' was a masterclass in apophasis.",
+        synonyms: [
+            "Paralipsis",
+            "Preterition"
+        ],
+        antonyms: [
+            "Direct assertion",
+            "Explicit statement"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 3,
+        term: "Acedia",
+        pronunciation: "/əˈsiːdiə/",
+        partOfSpeech: "Noun",
+        meaning: "A state of spiritual or mental listlessness, apathy, and profound indifference.",
+        nuance: "Historically associated with monastic life, it describes more than ordinary boredom: a weariness with one's duties, purpose, or existence.",
+        etymology: "Late Latin acedia, from Greek akēdia, meaning lack of care.",
+        example: "The monastery's chronicler described a creeping acedia that made even prayer feel insurmountable.",
+        synonyms: [
+            "Listlessness",
+            "Apathy",
+            "Despondency"
+        ],
+        antonyms: [
+            "Zeal",
+            "Fervour",
+            "Engagement"
+        ],
+        category: "Philosophy",
+        difficulty: "Expert"
+    },
+    {
+        id: 4,
+        term: "Haecceity",
+        pronunciation: "/hɛkˈsiːɪti/",
+        partOfSpeech: "Noun",
+        meaning: "The particular quality or set of characteristics that makes something uniquely itself.",
+        nuance: "A technical concept in medieval philosophy, especially associated with Duns Scotus; it concerns individual identity rather than general qualities.",
+        etymology: "Medieval Latin haecceitas, from haec, meaning this.",
+        example: "The haecceity of the old city lay in its peculiar combination of sounds, smells, and architectural irregularities.",
+        synonyms: [
+            "Thisness",
+            "Individuality",
+            "Particularity"
+        ],
+        antonyms: [
+            "Generality",
+            "Universality"
+        ],
+        category: "Philosophy",
+        difficulty: "Expert"
+    },
+    {
+        id: 5,
+        term: "Anomie",
+        pronunciation: "/ˈænəmi/",
+        partOfSpeech: "Noun",
+        meaning: "A condition of social instability arising from a breakdown or absence of shared norms and values.",
+        nuance: "Associated with Émile Durkheim, it describes a disorienting loss of social regulation, not simply personal loneliness.",
+        etymology: "French anomie, from Greek anomia, meaning lawlessness.",
+        example: "The rapid collapse of traditional institutions produced a sense of anomie among the displaced population.",
+        synonyms: [
+            "Normlessness",
+            "Social disorientation"
+        ],
+        antonyms: [
+            "Social cohesion",
+            "Normative stability"
+        ],
+        category: "Sociology",
+        difficulty: "Advanced"
+    },
+    {
+        id: 6,
+        term: "Aboulia",
+        pronunciation: "/əˈbuːliə/",
+        partOfSpeech: "Noun",
+        meaning: "A marked reduction in the ability to initiate or sustain voluntary action.",
+        nuance: "A clinical term involving impaired motivation and decision-making; not simply procrastination or laziness.",
+        etymology: "Greek aboulia, meaning lack of will or indecision.",
+        example: "What appeared to be indifference was, in fact, closer to aboulia: an inability to translate intention into action.",
+        synonyms: [
+            "Impaired volition",
+            "Indecisiveness"
+        ],
+        antonyms: [
+            "Volition",
+            "Resolve",
+            "Initiative"
+        ],
+        category: "Psychology",
+        difficulty: "Expert"
+    },
+    {
+        id: 7,
+        term: "Alexithymia",
+        pronunciation: "/ˌeɪlɛksɪˈθaɪmiə/",
+        partOfSpeech: "Noun",
+        meaning: "Difficulty identifying, distinguishing, and describing one's emotions.",
+        nuance: "It concerns emotional awareness and expression, not an absence of feelings.",
+        etymology: "Coined from Greek roots: a-, without; lexis, words; and thymos, emotion or feeling.",
+        example: "He could describe every detail of the argument but struggled to articulate what it had made him feel: a possible expression of alexithymia.",
+        synonyms: [
+            "Emotional unawareness",
+            "Difficulty identifying feelings"
+        ],
+        antonyms: [
+            "Emotional awareness",
+            "Emotional articulation"
+        ],
+        category: "Psychology",
+        difficulty: "Advanced"
+    },
+    {
+        id: 8,
+        term: "Limerence",
+        pronunciation: "/ˈlɪmərəns/",
+        partOfSpeech: "Noun",
+        meaning: "An intense, involuntary state of romantic fixation characterised by intrusive thoughts and a longing for reciprocation.",
+        nuance: "Unlike ordinary attraction, limerence often involves idealisation and emotional dependence on signs of returned affection.",
+        etymology: "Coined by psychologist Dorothy Tennov in the twentieth century.",
+        example: "What she had mistaken for an extraordinary connection was perhaps limerence sustained by uncertainty.",
+        synonyms: [
+            "Infatuation",
+            "Romantic fixation",
+            "Obsession"
+        ],
+        antonyms: [
+            "Indifference",
+            "Detachment"
+        ],
+        category: "Psychology",
+        difficulty: "Advanced"
+    },
+    {
+        id: 9,
+        term: "Parataxic distortion",
+        pronunciation: "/ˌpærəˈtæksɪk dɪˈstɔːrʃən/",
+        partOfSpeech: "Noun",
+        meaning: "A tendency to perceive another person through expectations shaped by earlier relationships.",
+        nuance: "A concept associated with Harry Stack Sullivan's interpersonal theory; past relational patterns can distort how we interpret present interactions.",
+        etymology: "From parataxis, meaning placement side by side, and distortion.",
+        example: "She interpreted his silence as rejection, perhaps through a parataxic distortion inherited from earlier relationships.",
+        synonyms: [
+            "Relational projection",
+            "Perceptual distortion"
+        ],
+        antonyms: [
+            "Unbiased perception",
+            "Accurate appraisal"
+        ],
+        category: "Psychology",
+        difficulty: "Expert"
+    },
+    {
+        id: 10,
+        term: "Bovarism",
+        pronunciation: "/ˈbəʊvərɪzəm/",
+        partOfSpeech: "Noun",
+        meaning: "A tendency to imagine oneself as fundamentally different from one's actual circumstances or identity.",
+        nuance: "Named after Emma Bovary, the protagonist of Flaubert's novel; it describes dissatisfaction fuelled by idealised fantasies of a more glamorous existence.",
+        etymology: "French bovarysme, derived from Madame Bovary by Gustave Flaubert.",
+        example: "Her bovarism made the ordinary details of provincial life seem intolerably small.",
+        synonyms: [
+            "Self-idealisation",
+            "Escapist fantasy"
+        ],
+        antonyms: [
+            "Self-acceptance",
+            "Realism"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 11,
+        term: "Mumpsimus",
+        pronunciation: "/ˈmʌmpsɪməs/",
+        partOfSpeech: "Noun",
+        meaning: "A person who stubbornly persists in an error despite being shown it is wrong; also, the error itself.",
+        nuance: "Particularly satisfying when describing someone whose confidence survives every correction.",
+        etymology: "Traditionally traced to a story about a clergyman who persisted in saying mumpsimus instead of the correct Latin sumpsimus.",
+        example: "His insistence that the outdated interpretation was correct had become an intellectual mumpsimus.",
+        synonyms: [
+            "Obstinate error",
+            "Dogmatism",
+            "Stubbornness"
+        ],
+        antonyms: [
+            "Receptiveness",
+            "Open-mindedness"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 12,
+        term: "Quiddity",
+        pronunciation: "/ˈkwɪdɪti/",
+        partOfSpeech: "Noun",
+        meaning: "The inherent nature or essential quality of something.",
+        nuance: "A philosophical term concerned with what makes a thing what it is, rather than merely how it appears.",
+        etymology: "Medieval Latin quidditas, from Latin quid, meaning what.",
+        example: "The essay was less concerned with the appearance of power than with its quiddity.",
+        synonyms: [
+            "Essence",
+            "Essential nature",
+            "Whatness"
+        ],
+        antonyms: [
+            "Accident",
+            "Appearance"
+        ],
+        category: "Philosophy",
+        difficulty: "Expert"
+    },
+    {
+        id: 13,
+        term: "Psithurism",
+        pronunciation: "/ˈsɪθjʊrɪzəm/",
+        partOfSpeech: "Noun",
+        meaning: "The soft rustling or whispering sound of wind moving through leaves.",
+        nuance: "An unusually evocative word for a subtle natural sound, often used in literary descriptions.",
+        etymology: "From Greek psithurismos, meaning whispering or murmuring.",
+        example: "The only sound in the garden was the psithurism of rain-heavy leaves.",
+        synonyms: [
+            "Rustling",
+            "Whispering",
+            "Murmuring"
+        ],
+        antonyms: [
+            "Silence",
+            "Stillness"
+        ],
+        category: "Linguistic curiosities",
+        difficulty: "Expert"
+    },
+    {
+        id: 14,
+        term: "Dérive",
+        pronunciation: "/deɪˈriːv/",
+        partOfSpeech: "Noun",
+        meaning: "An unplanned journey through an urban environment, guided by the surroundings rather than a fixed destination.",
+        nuance: "In Situationist theory, it was a way of experiencing how urban spaces shape emotion, behaviour, and perception.",
+        etymology: "French dérive, meaning drift.",
+        example: "They spent the afternoon in dérive, wandering through unfamiliar streets without consulting a map.",
+        synonyms: [
+            "Drift",
+            "Aimless wandering",
+            "Urban exploration"
+        ],
+        antonyms: [
+            "Direct route",
+            "Planned itinerary"
+        ],
+        category: "Sociology",
+        difficulty: "Expert"
+    },
+    {
+        id: 15,
+        term: "Flâneur",
+        pronunciation: "/flɑːˈnɜːr/",
+        partOfSpeech: "Noun",
+        meaning: "An urban wanderer who observes city life without an obvious practical destination.",
+        nuance: "A literary and cultural figure associated with modernity, anonymity, observation, and the pleasures of wandering.",
+        etymology: "French flâneur, from flâner, meaning to stroll or loiter.",
+        example: "He moved through the city like a flâneur, attentive to its crowds but belonging to none of them.",
+        synonyms: [
+            "Wanderer",
+            "Urban observer",
+            "Stroller"
+        ],
+        antonyms: [
+            "Commuter",
+            "Purposeful traveller"
+        ],
+        category: "Literature",
+        difficulty: "Advanced"
+    },
+    {
+        id: 16,
+        term: "Hendiadys",
+        pronunciation: "/hɛnˈdaɪədɪs/",
+        partOfSpeech: "Noun",
+        meaning: "A figure of speech in which one idea is expressed through two words joined by a conjunction.",
+        nuance: "Instead of using an adjective and noun, the speaker uses two coordinated nouns to create emphasis or a particular rhythm.",
+        etymology: "From Greek hen dia dyoin, meaning one through two.",
+        example: "The phrase 'sound and fury' is often discussed as an example of hendiadys.",
+        synonyms: [
+            "Rhetorical construction",
+            "Coordinated expression"
+        ],
+        antonyms: [
+            "Simple modifier construction"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 17,
+        term: "Aposiopesis",
+        pronunciation: "/ˌæpəsaɪəˈpiːsɪs/",
+        partOfSpeech: "Noun",
+        meaning: "A rhetorical device in which a sentence is deliberately left unfinished.",
+        nuance: "The interruption may suggest anger, hesitation, overwhelming emotion, or an implication too powerful to articulate.",
+        etymology: "Greek aposiōpēsis, meaning becoming silent.",
+        example: "'If you ever do that again, I swear—' The threat's unfinished ending is an instance of aposiopesis.",
+        synonyms: [
+            "Rhetorical pause",
+            "Interrupted statement"
+        ],
+        antonyms: [
+            "Explicit completion",
+            "Full declaration"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 18,
+        term: "Anagnorisis",
+        pronunciation: "/ˌænəɡˈnɒrɪsɪs/",
+        partOfSpeech: "Noun",
+        meaning: "A moment of recognition or discovery in which a character gains crucial knowledge, often about their identity or circumstances.",
+        nuance: "In classical tragedy, anagnorisis can transform the meaning of everything that came before it.",
+        etymology: "Ancient Greek anagnōrisis, meaning recognition.",
+        example: "The final letter provides the protagonist's anagnorisis, revealing the truth about her family.",
+        synonyms: [
+            "Recognition",
+            "Revelation",
+            "Discovery"
+        ],
+        antonyms: [
+            "Ignorance",
+            "Misrecognition"
+        ],
+        category: "Literature",
+        difficulty: "Expert"
+    },
+    {
+        id: 19,
+        term: "Kenosis",
+        pronunciation: "/kɪˈnəʊsɪs/",
+        partOfSpeech: "Noun",
+        meaning: "The act of self-emptying or relinquishing power, especially in Christian theological thought.",
+        nuance: "Can also be used more broadly to describe deliberate self-abnegation or the surrender of ego.",
+        etymology: "Greek kenōsis, meaning an emptying.",
+        example: "The novel presents leadership as kenosis: the willingness to relinquish personal glory for others.",
+        synonyms: [
+            "Self-emptying",
+            "Self-abnegation",
+            "Renunciation"
+        ],
+        antonyms: [
+            "Self-aggrandisement",
+            "Self-assertion"
+        ],
+        category: "Philosophy",
+        difficulty: "Expert"
+    },
+    {
+        id: 20,
+        term: "Heterotopia",
+        pronunciation: "/ˌhɛtəroʊˈtoʊpiə/",
+        partOfSpeech: "Noun",
+        meaning: "A space that functions as an alternative or other kind of social space, reflecting or disrupting ordinary arrangements.",
+        nuance: "Associated with Michel Foucault, the concept is used to examine spaces such as cemeteries, museums, and institutions that organise social life in unusual ways.",
+        etymology: "From Greek heteros, meaning other, and topos, meaning place.",
+        example: "The museum functioned as a heterotopia, gathering objects and histories from otherwise disconnected worlds.",
+        synonyms: [
+            "Other space",
+            "Alternative space"
+        ],
+        antonyms: [
+            "Homogeneous space",
+            "Ordinary space"
+        ],
+        category: "Sociology",
+        difficulty: "Expert"
+    }
+];
+}),
+];
+
+//# sourceMappingURL=_1rin3z5d7a79n._.js.map
