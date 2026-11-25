@@ -1,5 +1,4 @@
-# lexicon-daily
-An editorial vocabulary-learning app for the verbally insufferable.
+
 # LEXICON.
 ### For the verbally insufferable.
 
