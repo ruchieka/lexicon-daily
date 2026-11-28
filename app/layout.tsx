@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navigation from "./components/Navigation";
 import ServiceWorkerRegistration from "./components/ServiceWorkerRegistration";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: "Lexicon Daily — A little pretension never hurt.",
@@ -67,6 +68,7 @@ export default function RootLayout({
         <div className="pb-20 md:pb-0">
           {children}
         </div>
+        <Analytics />
       </body>
     </html>
   );
