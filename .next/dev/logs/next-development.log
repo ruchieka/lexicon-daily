@@ -1,3 +1,8 @@
 {"timestamp":"00:00:00.885","source":"Server","level":"LOG","message":""}
 {"timestamp":"00:00:22.090","source":"Browser","level":"LOG","message":"LEXICON service worker registered."}
 {"timestamp":"00:00:22.090","source":"Browser","level":"LOG","message":"LEXICON service worker registered."}
+{"timestamp":"00:17:35.642","source":"Browser","level":"LOG","message":"LEXICON service worker registered: http://localhost:3000/"}
+{"timestamp":"00:17:35.642","source":"Browser","level":"LOG","message":"LEXICON service worker registered: http://localhost:3000/"}
+{"timestamp":"00:31:19.562","source":"Server","level":"LOG","message":"✓ Compiled in 56ms"}
+{"timestamp":"00:31:58.053","source":"Server","level":"LOG","message":"✓ Compiled in 54ms"}
+{"timestamp":"00:36:02.274","source":"Server","level":"LOG","message":"✓ Compiled in 289ms"}

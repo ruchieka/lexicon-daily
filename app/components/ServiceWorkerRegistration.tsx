@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from "react";
@@ -7,11 +8,17 @@ export default function ServiceWorkerRegistration() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/sw.js")
-        .then(() => {
-          console.log("LEXICON service worker registered.");
+        .then((registration) => {
+          console.log(
+            "LEXICON service worker registered:",
+            registration.scope
+          );
         })
         .catch((error) => {
-          console.error("Service worker registration failed:", error);
+          console.error(
+            "LEXICON service worker registration failed:",
+            error
+          );
         });
     }
   }, []);

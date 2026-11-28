@@ -292,11 +292,11 @@ var _s = __turbopack_context__.k.signature();
 function ServiceWorkerRegistration() {
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(2);
-    if ($[0] !== "a931113cc5c09f7f4423e8309fc560d9d206322895061397c123328b0df9963e") {
+    if ($[0] !== "04fb171110b49667b47cb43332852be8ec195c4d22882a3c5b648096fc3db800") {
         for(let $i = 0; $i < 2; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "a931113cc5c09f7f4423e8309fc560d9d206322895061397c123328b0df9963e";
+        $[0] = "04fb171110b49667b47cb43332852be8ec195c4d22882a3c5b648096fc3db800";
     }
     let t0;
     if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
@@ -316,10 +316,10 @@ function _ServiceWorkerRegistrationUseEffect() {
     }
 }
 function _ServiceWorkerRegistrationUseEffectAnonymous2(error) {
-    console.error("Service worker registration failed:", error);
+    console.error("LEXICON service worker registration failed:", error);
 }
-function _ServiceWorkerRegistrationUseEffectAnonymous() {
-    console.log("LEXICON service worker registered.");
+function _ServiceWorkerRegistrationUseEffectAnonymous(registration) {
+    console.log("LEXICON service worker registered:", registration.scope);
 }
 var _c;
 __turbopack_context__.k.register(_c, "ServiceWorkerRegistration");

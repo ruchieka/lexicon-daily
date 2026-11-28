@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "LEXICON. — For the verbally insufferable",
-    short_name: "LEXICON.",
+   name: "Lexicon Daily",
+short_name: "Lexicon Daily",
     description: "A little pretension never hurt.",
     start_url: "/",
     display: "standalone",
